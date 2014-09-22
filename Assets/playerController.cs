@@ -15,7 +15,7 @@ public class PlayerController : Photon.MonoBehaviour {
     public float upDownRange = 60.0f;
 
     void Start() {
-        //Screen.lockCursor = true;
+        Screen.lockCursor = true;
         rigidbody.freezeRotation = true;
         rigidbody.useGravity = false;
     }

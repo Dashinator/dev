@@ -4,13 +4,19 @@ using System.Collections;
 
 public class NetworkManager : MonoBehaviour {
     public GameObject playerPrefab;
+    public bool offlineMode = false;
     private const string roomName = "RoomName";
     private GameObject player;
 
 	// Use this for initialization
 	void Start () {
+        if (offlineMode) {
+            PhotonNetwork.offlineMode = true;
+            OnJoinedLobby();
+        } else {
         PhotonNetwork.ConnectUsingSettings("0.1");
         PhotonNetwork.logLevel = PhotonLogLevel.Full;
+        }
 	}
 
     void OnGUI()
