@@ -66,9 +66,11 @@ public class PlayerController : Photon.MonoBehaviour {
         return Mathf.Sqrt(2 * jumpHeight * gravity);
     }
 
-    void OnCollisionStay() {
+    void OnCollisionStay(Collision collisionInfo) {
         if (photonView.isMine) {
-            grounded = true;
+            if (collisionInfo.gameObject.tag == "Floor") {
+                grounded = true;
+            }
         }
     }
 }
