@@ -5,7 +5,6 @@ using System.Collections;
 public class NetworkManager : MonoBehaviour {
     public GameObject playerPrefab;
     private const string roomName = "RoomName";
-    private RoomInfo[] roomsList;
 
 	// Use this for initialization
 	void Start () {
@@ -17,11 +16,6 @@ public class NetworkManager : MonoBehaviour {
     {
         GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
     }
-    void OnReceivedRoomListUpdate()
-    {
-        roomsList = PhotonNetwork.GetRoomList();
-    }
-
     void OnJoinedLobby()
     {
         //roomsList = PhotonNetwork.GetRoomList();
@@ -37,6 +31,10 @@ public class NetworkManager : MonoBehaviour {
     void OnJoinedRoom()
     {
         // Spawn player
-        PhotonNetwork.Instantiate(playerPrefab.name, Vector3.up * 5, Quaternion.identity, 0);
+        GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, Vector3.up * 5, Quaternion.identity, 0);
+        player.GetComponent<PlayerController>().enabled = true;
+        player.GetComponentInChildren<Camera>().enabled = true;
+
+
     }
 }
