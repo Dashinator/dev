@@ -6,7 +6,6 @@ public class NetworkManager : MonoBehaviour {
     public GameObject playerPrefab;
     public bool offlineMode = false;
     private const string roomName = "RoomName";
-    private GameObject player;
 
 	// Use this for initialization
 	void Start () {
@@ -38,16 +37,15 @@ public class NetworkManager : MonoBehaviour {
     void OnJoinedRoom()
     {
         // Spawn player
-        player = PhotonNetwork.Instantiate(playerPrefab.name, Vector3.up * 5, Quaternion.identity, 0);
+        GameObject player = (GameObject)PhotonNetwork.Instantiate(playerPrefab.name, Vector3.up * 5, Quaternion.identity, 0);
+        //disable overlook cam
+
+        //enable player scrips
         player.GetComponent<PlayerController>().enabled = true;
-        enableCam();
+        player.GetComponent<GunController>().enabled = true;
+        player.transform.FindChild("PlayerCamera").gameObject.SetActive(true);
+        
 
 
-    }
-
-    void enableCam() {
-        player.GetComponentInChildren<Camera>().enabled = true;
-        player.GetComponentInChildren<AudioListener>().enabled = true;
-        player.GetComponentInChildren<GUILayer>().enabled = true;
     }
 }

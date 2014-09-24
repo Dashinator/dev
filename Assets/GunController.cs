@@ -10,14 +10,10 @@ public class GunController : MonoBehaviour {
     public Texture2D crosshairTexture;
     Rect position;
 
-    void Start() {
-
-    }
-
     void Update() {
         cooldown -= Time.deltaTime;
 
-        if (Input.GetButtonDown("Fire1")) {
+        if( Input.GetButtonDown("Fire1") ) {
             fire();
         }
 
@@ -30,38 +26,48 @@ public class GunController : MonoBehaviour {
     }
 
     void fire() {
+        Debug.Log("Fire");
+        if( cooldown > 0 ) {
+            return;
+        }
+
         Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
         Transform hitTransform;
         Vector3 hitPoint;
 
         hitTransform = FindClosestHitObject(ray, out hitPoint);
 
-        if (hitTransform != null) {
+        if( hitTransform != null ) {
             Debug.Log("We hit: " + hitTransform.name);
 
             ResourceManager h = hitTransform.GetComponent<ResourceManager>();
 
-            while (h == null && hitTransform.parent) {
+            while( h == null && hitTransform.parent ) {
                 hitTransform = hitTransform.parent;
                 h = hitTransform.GetComponent<ResourceManager>();
             }
 
-            if (h != null) {
-                h.TakeDamage(damage);
+            if( h != null ) {
+                PhotonView pv = h.GetComponent<PhotonView>();
+                if( pv == null ) {
+                    Debug.LogError("No photonView found");
+                } else {
+                    pv.RPC("TakeDamage", PhotonTargets.AllBuffered, damage);
+                }
             }
         }
-        
+
         cooldown = fireRate;
     }
 
-    Transform FindClosestHitObject(Ray ray, out Vector3 hitPoint) {
+    Transform FindClosestHitObject( Ray ray, out Vector3 hitPoint ) {
         RaycastHit[] hits = Physics.RaycastAll(ray);
         Transform closestHit = null;
         float distance = 0;
         hitPoint = Vector3.zero;
 
-        foreach (RaycastHit hit in hits) {
-            if (hit.transform != this.transform && (closestHit == null || hit.distance < distance)) {
+        foreach( RaycastHit hit in hits ) {
+            if( hit.transform != this.transform && (closestHit == null || hit.distance < distance) ) {
                 closestHit = hit.transform;
                 distance = hit.distance;
                 hitPoint = hit.point;

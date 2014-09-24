@@ -9,6 +9,7 @@ public class ResourceManager : MonoBehaviour {
         currentHitPoints = maxHealth;
 	}
 	
+    [RPC]
     public void TakeDamage(float amt) {
         currentHitPoints -= amt;
         if(currentHitPoints <= 0){
@@ -17,6 +18,12 @@ public class ResourceManager : MonoBehaviour {
     }
 
     void Die() {
-        Destroy(gameObject);
+        if( GetComponent<PhotonView>().instantiationId == 0 ) { 
+            Destroy(gameObject);
+        } else {
+            if( PhotonNetwork.isMasterClient ) {
+                PhotonNetwork.Destroy(gameObject);
+            }
+        }
     }
 }
