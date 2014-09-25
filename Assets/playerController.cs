@@ -20,7 +20,8 @@ public class PlayerController : Photon.MonoBehaviour {
         rigidbody.useGravity = false;
     }
 
-    void Awake() {
+    void OnApplicationFocus( bool focusStatus ) {
+        Screen.lockCursor = focusStatus;
     }
 
     void FixedUpdate() {

@@ -10,18 +10,25 @@ public class ResourceManager : MonoBehaviour {
 	}
 	
     [RPC]
-    public void TakeDamage(float amt) {
+    public void TakeDamage(float amt, string name) {
         currentHitPoints -= amt;
         if(currentHitPoints <= 0){
-            Die();
+            Die(name);
         }
     }
 
-    void Die() {
+    void Die(string name) {
         if( GetComponent<PhotonView>().instantiationId == 0 ) { 
             Destroy(gameObject);
         } else {
-            if( PhotonNetwork.isMasterClient ) {
+            if( GetComponent<PhotonView>().isMine ) {
+                if( gameObject.tag == "Player" ) {
+                    NetworkManager nm = GameObject.FindObjectOfType<NetworkManager>();
+                    nm.AddChatMessage(name + " just killed " + PhotonNetwork.player.name);
+                    nm.standbyCamera.SetActive(true);
+                    nm.respawnTimer = 3f;
+                }
+
                 PhotonNetwork.Destroy(gameObject);
             }
         }

@@ -52,7 +52,7 @@ public class GunController : MonoBehaviour {
                 if( pv == null ) {
                     Debug.LogError("No photonView found");
                 } else {
-                    pv.RPC("TakeDamage", PhotonTargets.AllBuffered, damage);
+                    pv.RPC("TakeDamage", PhotonTargets.AllBuffered, damage, PhotonNetwork.player.name);
                 }
             }
         }
