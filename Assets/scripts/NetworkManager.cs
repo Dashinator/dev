@@ -9,6 +9,8 @@ public class NetworkManager : MonoBehaviour {
     private bool connecting = false;
     public GameObject standbyCamera;
 
+    private bool locked = false;
+
     List<string> chatMessages;
     public int maxMessages = 5;
 
@@ -122,19 +124,33 @@ public class NetworkManager : MonoBehaviour {
             standbyCamera.SetActive(false);
 
             //enable player scrips
-            player.GetComponent<PlayerController>().enabled = true;
+            /*player.GetComponent<PlayerController>().enabled = true;
             player.GetComponent<GunController>().enabled = true;
             player.transform.FindChild("PlayerCamera").gameObject.SetActive(true);
+            */
+            player.GetComponent<Enabler>().enable(player);
+            Screen.lockCursor = true;
+            locked = true;
+        }
+    }
+
+    void OnApplicationFocus(bool FocusStatus){
+        if(locked){
+            Screen.lockCursor = true;
         }
     }
 
     void Update() {
         if( respawnTimer > 0 ) {
             respawnTimer -= Time.deltaTime;
+            Screen.lockCursor = false;
+            locked = false;
 
             if( respawnTimer <= 0 ) {
                 spawnMyPlayer();
             }
         }
     }
+
+    
 }

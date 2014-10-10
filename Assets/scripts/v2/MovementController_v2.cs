@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerController : Photon.MonoBehaviour {
+public class MovementController_v2 : Photon.MonoBehaviour {
     public float speed = 10f;
-    public float mouseSensitivity = 5.0f;
 
     public float gravity = 10.0f;
     public float maxVelocityChange = 10.0f;
@@ -11,35 +10,25 @@ public class PlayerController : Photon.MonoBehaviour {
     public bool canJump = true;
     private bool grounded = false;
 
-    float verticalRotation = 0;
-    public float upDownRange = 60.0f;
-
     void Start() {
-        Screen.lockCursor = true;
         rigidbody.freezeRotation = true;
         rigidbody.useGravity = false;
-    }
-
-    void OnApplicationFocus( bool focusStatus ) {
-        Screen.lockCursor = focusStatus;
     }
 
     void FixedUpdate() {
         if (photonView.isMine) {
             InputMovement();
+            outOfBoulds();
+        }
+    }
+
+    private void outOfBoulds() {
+        if (transform.position.y <= -20 && photonView.isMine) {
+            this.photonView.RPC("Die_RPC", PhotonTargets.AllBuffered, "Gravity");
         }
     }
 
     void InputMovement() {
-
-        float rotLeftRight = Input.GetAxis("Mouse X") * mouseSensitivity;
-        transform.Rotate(0, rotLeftRight, 0);
-         
-        verticalRotation -= Input.GetAxis("Mouse Y") * mouseSensitivity;
-        verticalRotation = Mathf.Clamp(verticalRotation, -upDownRange, upDownRange);
-        Camera.main.transform.localRotation = Quaternion.Euler(verticalRotation, 0, 0);
-
-
 
         Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         targetVelocity = transform.TransformDirection(targetVelocity);

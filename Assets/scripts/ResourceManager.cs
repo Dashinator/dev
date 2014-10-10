@@ -23,7 +23,7 @@ public class ResourceManager : MonoBehaviour {
         } else {
             if( GetComponent<PhotonView>().isMine ) {
                 if( gameObject.tag == "Player" ) {
-                    NetworkManager nm = GameObject.FindObjectOfType<NetworkManager>();
+                    NetworkManager_v2 nm = GameObject.FindObjectOfType<NetworkManager_v2>();
                     nm.AddChatMessage(name + " just killed " + PhotonNetwork.player.name);
                     nm.standbyCamera.SetActive(true);
                     nm.respawnTimer = 3f;
@@ -32,5 +32,10 @@ public class ResourceManager : MonoBehaviour {
                 PhotonNetwork.Destroy(gameObject);
             }
         }
+    }
+
+    [RPC]
+    void Die_RPC(string name) {
+        Die(name);
     }
 }
