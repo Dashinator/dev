@@ -10,6 +10,8 @@ public class NetworkManager_v2 : MonoBehaviour {
 
     private bool locked = false;
 
+    List<PlayerStats> playerList;
+
     List<string> chatMessages;
     public int maxMessages = 5;
 
@@ -21,6 +23,7 @@ public class NetworkManager_v2 : MonoBehaviour {
         spawnSpots = GameObject.FindObjectsOfType<SpawnSpot>();
         PhotonNetwork.player.name = PlayerPrefs.GetString("Username", "Player");
         chatMessages = new List<string>();
+        playerList = new List<PlayerStats>();
 	}
 	
 	void OnDestroy () {
@@ -83,17 +86,29 @@ public class NetworkManager_v2 : MonoBehaviour {
         }
 
         if (PhotonNetwork.connected && !connecting) {
-            GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
-            GUILayout.BeginVertical();
-            GUILayout.FlexibleSpace();
-            foreach (string message in chatMessages) {
-                GUILayout.Label(message);
+            if (!PhotonNetwork.isMasterClient) {
+                GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
+                GUILayout.BeginVertical();
+                GUILayout.FlexibleSpace();
+                foreach (string message in chatMessages) {
+                    GUILayout.Label(message);
+                }
+
+
+
+                GUILayout.EndVertical();
+                GUILayout.EndArea();
+            } else {
+                GUILayout.BeginArea(new Rect(Screen.width / 4, Screen.height / 4, Screen.width / 2, Screen.height / 2), GUIContent.none, "box");
+                GUILayout.BeginHorizontal();
+                foreach (PlayerStats player in playerList) {
+                    GUILayout.Label(player.player.name);
+                    GUILayout.Label(player.kill.ToString());
+                    GUILayout.Label(player.death.ToString());
+                    GUILayout.EndHorizontal();
+                }
+                GUILayout.EndArea();
             }
-
-
-
-            GUILayout.EndVertical();
-            GUILayout.EndArea();
         }
     }
 
@@ -117,8 +132,24 @@ public class NetworkManager_v2 : MonoBehaviour {
         connecting = false;
         if (PhotonNetwork.player.name != "server" || PhotonNetwork.offlineMode) {
             AddChatMessage(PhotonNetwork.player.name + " has joined");
+            GetComponent<PhotonView>().RPC("PlayerJoined", PhotonTargets.MasterClient, PhotonNetwork.player);
             spawnMyPlayer();
         }
+    }
+
+    void OnPhotonPlayerDisconnected(PhotonPlayer other) {
+        if (PhotonNetwork.isMasterClient) {
+            foreach (PlayerStats playerS in playerList) {
+                if (playerS.player.name == other.name) {
+                    playerList.Remove(playerS);
+                }
+            }
+        }
+    }
+
+    [RPC]
+    void PlayerJoined(PhotonPlayer pPlayer) {
+        playerList.Add(new PlayerStats() { player = pPlayer, kill = 0, death = 0});
     }
 
     void spawnMyPlayer() {
@@ -126,7 +157,7 @@ public class NetworkManager_v2 : MonoBehaviour {
             Debug.LogError("spawn crash");
             return;
         }
-        SpawnSpot mySpawnSpot = spawnSpots[Random.Range(0, spawnSpots.Length)];
+        SpawnSpot  mySpawnSpot = spawnSpots[Random.Range(0, spawnSpots.Length)];
         // Spawn player
         GameObject player = (GameObject)PhotonNetwork.Instantiate(playerPrefab.name, (mySpawnSpot.transform.position + Vector3.up), mySpawnSpot.transform.rotation, 0);
         if (player != null) {
@@ -135,11 +166,6 @@ public class NetworkManager_v2 : MonoBehaviour {
             //disable overlook cam
             standbyCamera.SetActive(false);
 
-            //enable player scrips
-            /*player.GetComponent<PlayerController>().enabled = true;
-            player.GetComponent<GunController>().enabled = true;
-            player.transform.FindChild("PlayerCamera").gameObject.SetActive(true);
-            */
             player.GetComponent<Enabler>().enable(player);
             Screen.lockCursor = true;
             locked = true;
@@ -158,4 +184,10 @@ public class NetworkManager_v2 : MonoBehaviour {
         }
     }
 
+}
+
+public class PlayerStats {
+    public PhotonPlayer player;
+    public int kill;
+    public int death;
 }

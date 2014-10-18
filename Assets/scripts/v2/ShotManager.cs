@@ -10,16 +10,16 @@ public class ShotManager : MonoBehaviour {
 
 
     [RPC]
-    void Fire_Receive(int id) {
+    void Fire_Receive(int id, PhotonMessageInfo info) {
         //print("shot received");
         if (PhotonNetwork.isMasterClient) {
             //print("id shot from: " + id);
             PhotonView shooter = PhotonView.Find(id);
-            CalcShot(shooter.gameObject);
+            CalcShot(shooter.gameObject, info);
         }
     }
 
-    private void CalcShot(GameObject shooter) {
+    private void CalcShot(GameObject shooter, PhotonMessageInfo info) {
         //verkrijg gun informatie uit speler;
         GunController_v2 gunInfo = shooter.GetComponent<GunController_v2>();
         float cooldown = gunInfo.cooldown;
@@ -70,7 +70,7 @@ public class ShotManager : MonoBehaviour {
                     Debug.LogError("No photonView found");
                 } else {
                     //geef aan iedereen door dat target schade krijgt
-                    pv.RPC("TakeDamage", PhotonTargets.AllBuffered, damage, PhotonNetwork.player.name);
+                    pv.RPC("TakeDamage", PhotonTargets.AllBuffered, damage, info.sender.name);
                 }
             }
 
