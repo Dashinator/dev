@@ -18,13 +18,6 @@ public class MovementController_v2 : Photon.MonoBehaviour {
     void FixedUpdate() {
         if (photonView.isMine) {
             InputMovement();
-            outOfBoulds();
-        }
-    }
-
-    private void outOfBoulds() {
-        if (transform.position.y <= -20 && photonView.isMine) {
-            this.photonView.RPC("Die_RPC", PhotonTargets.AllBuffered, "Gravity");
         }
     }
 
