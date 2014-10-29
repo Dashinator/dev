@@ -31,6 +31,11 @@ public class FXManager : MonoBehaviour {
     }
 
     [RPC]
+    void gunFX_RPC(Vector3 startPos, Vector3 endPos) {
+        SniperBulletFX(startPos, endPos);
+    }
+
+    //[RPC]
     public void SniperBulletFX(Vector3 startPos, Vector3 endPos) {
         for (int i = 0; i < FXList.Count; i++) {
             if (!FXList[i].activeInHierarchy) {

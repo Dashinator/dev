@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.String;
 
 public class NetworkManager_v2 : MonoBehaviour
 {
@@ -118,25 +117,23 @@ public class NetworkManager_v2 : MonoBehaviour
             else
             {
                 GUILayout.BeginArea(new Rect(Screen.width / 4, Screen.height / 4, Screen.width / 2, Screen.height / 2), GUIContent.none, "box");
-                GUILayout.BeginHorizontal();
                 GUILayout.BeginVertical();
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Player");
                 GUILayout.Label("kills");
                 GUILayout.Label("Deaths");
-                GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
 
                 foreach (PlayerStats player in playerList)
                 {
-                    GUILayout.Label(player.player.name);
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label(player.player);
                     GUILayout.Label(player.kill.ToString());
                     GUILayout.Label(player.death.ToString());
                     GUILayout.FlexibleSpace();
+                    GUILayout.EndHorizontal();
                 }
-                GUILayout.EndHorizontal();
-                GUILayout.FlexibleSpace();
-                GUILayout.EndVertical();
                 GUILayout.EndHorizontal();
                 GUILayout.EndArea();
             }
@@ -294,6 +291,16 @@ public class NetworkManager_v2 : MonoBehaviour
 
                 playerList.Add(new PlayerStats() { player = tempPlayer, kill = tempKill, death = tempDeath });
             }
+        }
+    }
+
+    [RPC]
+    void Enable(int viewId) {
+        GameObject player = PhotonView.Find(viewId).gameObject;
+
+        MonoBehaviour[] comps = player.GetComponents<MonoBehaviour>();
+        foreach (MonoBehaviour c in comps) {
+            c.enabled = true;
         }
     }
 

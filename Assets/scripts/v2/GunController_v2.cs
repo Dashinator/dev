@@ -30,9 +30,4 @@ public class GunController_v2 : MonoBehaviour {
         PhotonView master = GameObject.Find("Scripts").GetComponent<PhotonView>();
         master.RPC("Fire_Receive", PhotonTargets.MasterClient, ID);
     }
-
-    [RPC]
-    void gunFX_RPC(Vector3 startPos, Vector3 endPos) {
-        fxManager.SniperBulletFX(startPos, endPos);
-    }
 }

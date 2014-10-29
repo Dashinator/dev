@@ -80,7 +80,7 @@ public class ShotManager : MonoBehaviour {
             hitPoint = end;
         }
         //geeft aan iedereen door dat er een gunray getekend moet worden
-        shooter.GetComponent<PhotonView>().RPC("gunFX_RPC", PhotonTargets.AllBuffered, startPos, hitPoint);
+        GameObject.Find("Scripts").GetComponent<PhotonView>().RPC("gunFX_RPC", PhotonTargets.AllBuffered, startPos, hitPoint);
 
         gunInfo.cooldown = 0.5f;
 
